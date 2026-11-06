@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\Kalyx.Core\Kalyx.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.9.2" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>Kalyx</AssemblyName>
+    <RootNamespace>Kalyx</RootNamespace>
+    <Product>KALYX</Product>
+    <Title>KALYX Code Analysis Tool</Title>
+    <Description>Local C# knowledge graph, blast-radius, architecture smell, hotspot, visualization, export, and MCP analysis tool.</Description>
+    <Version>0.2.0</Version>
+
+    <!-- dotnet tool packaging: dotnet tool install -g Kalyx -->
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>kalyx</ToolCommandName>
+    <PackageId>Kalyx</PackageId>
+    <Authors>KALYX contributors</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>kalyx-logo.png</PackageIcon>
+    <PackageTags>csharp;roslyn;code-analysis;dependency-graph;blast-radius;mcp</PackageTags>
+    <PackageOutputPath>./nupkg</PackageOutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Embedded so `kalyx viz` works anywhere -->
+    <EmbeddedResource Include="..\..\assets\kalyx-logo.png" LogicalName="Kalyx.kalyx-logo.png" />
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+    <None Include="..\..\assets\kalyx-logo.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,144 @@
+KALYX Implementation Specification
+Version 0.2.0
+================================
+
+Purpose
+-------
+KALYX is a local-first C# code-analysis tool. It parses source files into a
+knowledge graph, runs graph algorithms, and provides JSON, text, HTML, Mermaid,
+DOT, CLI, and MCP interfaces.
+
+Solution
+--------
+- Kalyx.slnx
+- src/Kalyx.Core: graph models, parsing, indexing, exports, and algorithms
+- src/Kalyx.Cli: command-line entry point and MCP server
+- tests/Kalyx.Tests: focused graph behavior tests
+
+Graph model
+-----------
+The canonical graph format is JSON and contains:
+
+- SchemaVersion
+- KalyxVersion
+- Nodes
+- Edges
+
+GraphNode fields:
+- Id
+- Name
+- Kind
+- File
+- Line
+- Community
+- Neighbors
+
+Compatibility aliases Name/Label, Kind/NodeType, File/SourceFile, and
+Line/LineNumber preserve compatibility with older JSON variants.
+
+GraphEdge fields:
+- FromId
+- ToId
+- Kind
+- Weight
+- Confidence
+- Origin
+
+Origin is either Extracted or Inferred. Direct Roslyn resolution should use
+high-confidence extracted edges. Name-based inference should remain marked as
+Inferred and use reduced confidence.
+
+Parsing
+-------
+CSharpParser uses Microsoft.CodeAnalysis.CSharp to enumerate and parse C# source
+files. Build output directories (bin and obj), generated source directories, and
+other non-source directories must be excluded.
+
+The parser extracts:
+- Files and namespaces
+- Classes, interfaces, records, and structs
+- Methods
+- Namespace imports
+- Inheritance relationships
+- Implemented-interface relationships
+- Direct method invocation relationships
+- Symbol references where available
+
+Graph construction
+------------------
+GraphStore loads and saves the graph as JSON. ImportResolver and EdgeResolver
+connect and normalize extracted symbols. Equivalent edges should be merged,
+direct-confidence edges preferred, and neighbor sets kept synchronized.
+
+Analysis features
+-----------------
+- GraphQueries: query, path, and explain operations
+- BlastRadius: reverse-edge traversal and risk scoring
+- CodeSmells: Tarjan cycle detection, god nodes, and instability
+- Hotspots: combines graph coupling and Git churn
+- TrendAnalyzer: compares file churn over Git history
+- GraphDiff: compares node and edge snapshots
+- DotExporter: generates Graphviz DOT
+- MermaidExporter: generates Mermaid syntax
+- HtmlRenderer: generates standalone interactive HTML
+
+CLI
+---
+The executable and assembly name is Kalyx. All user-facing output and command
+names use KALYX branding:
+
+- parse
+- parse-multi
+- query
+- path
+- explain
+- viz
+- mermaid
+- cycles
+- smells
+- hotspots
+- impact
+- trend
+- diff
+- changed
+- ask
+- export
+- mcp
+- help
+
+Visualization
+-------------
+HtmlRenderer writes an interactive canvas visualization with:
+- Standalone HTML and embedded graph JSON
+- Embedded assets/kalyx-logo.png data URI
+- KALYX browser title
+- KALYX logo and Knowledge Graph status
+- Node community colors
+- Force-directed edge and node layout
+
+MCP protocol
+------------
+McpServer communicates through newline-delimited JSON-RPC on standard input and
+standard output. It supports initialize, tools/list, tools/call, and ping.
+
+Server identity:
+- name: KALYX
+- version: 0.2.0
+- protocol: 2024-11-05
+
+Tool names:
+- kalyx_query
+- kalyx_path
+- kalyx_impact
+- kalyx_smells
+- kalyx_explain
+
+Build and validation
+--------------------
+dotnet restore Kalyx.slnx
+dotnet build Kalyx.slnx
+dotnet test Kalyx.slnx
+
+Regenerate the workspace graph after source changes:
+dotnet run --project src/Kalyx.Cli -- parse . --out graph.json
+dotnet run --project src/Kalyx.Cli -- viz graph.json --out graph.html

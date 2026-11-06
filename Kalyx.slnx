@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Kalyx.Cli/Kalyx.Cli.csproj" />
+    <Project Path="src/Kalyx.Core/Kalyx.Core.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Kalyx.Tests/Kalyx.Tests.csproj" />
+  </Folder>
+</Solution>
